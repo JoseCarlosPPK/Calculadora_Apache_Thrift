@@ -1,7 +1,7 @@
 import glob
 import sys
 
-from calculadora import Calculadora
+import Calculadora
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport
@@ -17,16 +17,24 @@ class CalculadoraHandler:
     def __init__(self):
         self.log = {}
 
-    def ping(self):
-        print("me han hecho ping()")
 
-    def suma(self, n1, n2):
-        print("sumando " + str(n1) + " con " + str(n2))
-        return n1 + n2
+    def suma_matrices(self, m1, m2):
+        dimension_m1 = (len(m1), len(m1[0]))
+        dimension_m2 = (len(m2), len(m2[0]))
 
-    def resta(self, n1, n2):
-        print("restando " + str(n1) + " con " + str(n2))
-        return n1 - n2
+        if dimension_m1 != dimension_m2:
+            return None
+        
+        matriz_suma = []
+
+        for fila_m1, fila_m2 in zip(m1,m2):
+            fila_suma = []
+            for col_m1, col_m2 in zip(fila_m1, fila_m2):
+                fila_suma.append(col_m1+col_m2)
+
+        return matriz_suma
+
+
 
 
 if __name__ == "__main__":
