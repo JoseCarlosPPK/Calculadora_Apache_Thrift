@@ -144,7 +144,7 @@ class suma_matrices_args:
         if ftype == TType.LIST:
           self.m1 = []
           (_etype3, _size0) = iprot.readListBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _elem5 = iprot.readDouble();
             self.m1.append(_elem5)
           iprot.readListEnd()
@@ -154,7 +154,7 @@ class suma_matrices_args:
         if ftype == TType.LIST:
           self.dim1 = []
           (_etype9, _size6) = iprot.readListBegin()
-          for _i10 in xrange(_size6):
+          for _i10 in range(_size6):
             _elem11 = iprot.readI64();
             self.dim1.append(_elem11)
           iprot.readListEnd()
@@ -164,7 +164,7 @@ class suma_matrices_args:
         if ftype == TType.LIST:
           self.m2 = []
           (_etype15, _size12) = iprot.readListBegin()
-          for _i16 in xrange(_size12):
+          for _i16 in range(_size12):
             _elem17 = iprot.readDouble();
             self.m2.append(_elem17)
           iprot.readListEnd()
@@ -174,7 +174,7 @@ class suma_matrices_args:
         if ftype == TType.LIST:
           self.dim2 = []
           (_etype21, _size18) = iprot.readListBegin()
-          for _i22 in xrange(_size18):
+          for _i22 in range(_size18):
             _elem23 = iprot.readI64();
             self.dim2.append(_elem23)
           iprot.readListEnd()
@@ -262,7 +262,7 @@ class suma_matrices_result:
         if ftype == TType.LIST:
           self.success = []
           (_etype31, _size28) = iprot.readListBegin()
-          for _i32 in xrange(_size28):
+          for _i32 in range(_size28):
             _elem33 = iprot.readDouble();
             self.success.append(_elem33)
           iprot.readListEnd()
