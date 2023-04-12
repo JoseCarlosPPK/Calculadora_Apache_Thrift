@@ -18,11 +18,13 @@ except:
 
 
 class Iface:
-  def suma_matrices(self, m1, m2):
+  def suma_matrices(self, m1, dim1, m2, dim2):
     """
     Parameters:
      - m1
+     - dim1
      - m2
+     - dim2
     """
     pass
 
@@ -34,20 +36,24 @@ class Client(Iface):
       self._oprot = oprot
     self._seqid = 0
 
-  def suma_matrices(self, m1, m2):
+  def suma_matrices(self, m1, dim1, m2, dim2):
     """
     Parameters:
      - m1
+     - dim1
      - m2
+     - dim2
     """
-    self.send_suma_matrices(m1, m2)
+    self.send_suma_matrices(m1, dim1, m2, dim2)
     return self.recv_suma_matrices()
 
-  def send_suma_matrices(self, m1, m2):
+  def send_suma_matrices(self, m1, dim1, m2, dim2):
     self._oprot.writeMessageBegin('suma_matrices', TMessageType.CALL, self._seqid)
     args = suma_matrices_args()
     args.m1 = m1
+    args.dim1 = dim1
     args.m2 = m2
+    args.dim2 = dim2
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
@@ -93,7 +99,7 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = suma_matrices_result()
-    result.success = self._handler.suma_matrices(args.m1, args.m2)
+    result.success = self._handler.suma_matrices(args.m1, args.dim1, args.m2, args.dim2)
     oprot.writeMessageBegin("suma_matrices", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -106,18 +112,24 @@ class suma_matrices_args:
   """
   Attributes:
    - m1
+   - dim1
    - m2
+   - dim2
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.LIST, 'm1', (TType.LIST,(TType.DOUBLE,None)), None, ), # 1
-    (2, TType.LIST, 'm2', (TType.LIST,(TType.DOUBLE,None)), None, ), # 2
+    (1, TType.LIST, 'm1', (TType.DOUBLE,None), None, ), # 1
+    (2, TType.LIST, 'dim1', (TType.I64,None), None, ), # 2
+    (3, TType.LIST, 'm2', (TType.DOUBLE,None), None, ), # 3
+    (4, TType.LIST, 'dim2', (TType.I64,None), None, ), # 4
   )
 
-  def __init__(self, m1=None, m2=None,):
+  def __init__(self, m1=None, dim1=None, m2=None, dim2=None,):
     self.m1 = m1
+    self.dim1 = dim1
     self.m2 = m2
+    self.dim2 = dim2
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -133,28 +145,38 @@ class suma_matrices_args:
           self.m1 = []
           (_etype3, _size0) = iprot.readListBegin()
           for _i4 in xrange(_size0):
-            _elem5 = []
-            (_etype9, _size6) = iprot.readListBegin()
-            for _i10 in xrange(_size6):
-              _elem11 = iprot.readDouble();
-              _elem5.append(_elem11)
-            iprot.readListEnd()
+            _elem5 = iprot.readDouble();
             self.m1.append(_elem5)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.LIST:
+          self.dim1 = []
+          (_etype9, _size6) = iprot.readListBegin()
+          for _i10 in xrange(_size6):
+            _elem11 = iprot.readI64();
+            self.dim1.append(_elem11)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.LIST:
           self.m2 = []
           (_etype15, _size12) = iprot.readListBegin()
           for _i16 in xrange(_size12):
-            _elem17 = []
-            (_etype21, _size18) = iprot.readListBegin()
-            for _i22 in xrange(_size18):
-              _elem23 = iprot.readDouble();
-              _elem17.append(_elem23)
-            iprot.readListEnd()
+            _elem17 = iprot.readDouble();
             self.m2.append(_elem17)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.LIST:
+          self.dim2 = []
+          (_etype21, _size18) = iprot.readListBegin()
+          for _i22 in xrange(_size18):
+            _elem23 = iprot.readI64();
+            self.dim2.append(_elem23)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -170,22 +192,30 @@ class suma_matrices_args:
     oprot.writeStructBegin('suma_matrices_args')
     if self.m1 is not None:
       oprot.writeFieldBegin('m1', TType.LIST, 1)
-      oprot.writeListBegin(TType.LIST, len(self.m1))
+      oprot.writeListBegin(TType.DOUBLE, len(self.m1))
       for iter24 in self.m1:
-        oprot.writeListBegin(TType.DOUBLE, len(iter24))
-        for iter25 in iter24:
-          oprot.writeDouble(iter25)
-        oprot.writeListEnd()
+        oprot.writeDouble(iter24)
+      oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.dim1 is not None:
+      oprot.writeFieldBegin('dim1', TType.LIST, 2)
+      oprot.writeListBegin(TType.I64, len(self.dim1))
+      for iter25 in self.dim1:
+        oprot.writeI64(iter25)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.m2 is not None:
-      oprot.writeFieldBegin('m2', TType.LIST, 2)
-      oprot.writeListBegin(TType.LIST, len(self.m2))
+      oprot.writeFieldBegin('m2', TType.LIST, 3)
+      oprot.writeListBegin(TType.DOUBLE, len(self.m2))
       for iter26 in self.m2:
-        oprot.writeListBegin(TType.DOUBLE, len(iter26))
-        for iter27 in iter26:
-          oprot.writeDouble(iter27)
-        oprot.writeListEnd()
+        oprot.writeDouble(iter26)
+      oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.dim2 is not None:
+      oprot.writeFieldBegin('dim2', TType.LIST, 4)
+      oprot.writeListBegin(TType.I64, len(self.dim2))
+      for iter27 in self.dim2:
+        oprot.writeI64(iter27)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -213,7 +243,7 @@ class suma_matrices_result:
   """
 
   thrift_spec = (
-    (0, TType.LIST, 'success', (TType.LIST,(TType.DOUBLE,None)), None, ), # 0
+    (0, TType.LIST, 'success', (TType.DOUBLE,None), None, ), # 0
   )
 
   def __init__(self, success=None,):
@@ -233,12 +263,7 @@ class suma_matrices_result:
           self.success = []
           (_etype31, _size28) = iprot.readListBegin()
           for _i32 in xrange(_size28):
-            _elem33 = []
-            (_etype37, _size34) = iprot.readListBegin()
-            for _i38 in xrange(_size34):
-              _elem39 = iprot.readDouble();
-              _elem33.append(_elem39)
-            iprot.readListEnd()
+            _elem33 = iprot.readDouble();
             self.success.append(_elem33)
           iprot.readListEnd()
         else:
@@ -255,12 +280,9 @@ class suma_matrices_result:
     oprot.writeStructBegin('suma_matrices_result')
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.LIST, 0)
-      oprot.writeListBegin(TType.LIST, len(self.success))
-      for iter40 in self.success:
-        oprot.writeListBegin(TType.DOUBLE, len(iter40))
-        for iter41 in iter40:
-          oprot.writeDouble(iter41)
-        oprot.writeListEnd()
+      oprot.writeListBegin(TType.DOUBLE, len(self.success))
+      for iter34 in self.success:
+        oprot.writeDouble(iter34)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
