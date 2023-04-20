@@ -1,3 +1,18 @@
+exception DivisionZero {
+   1: string msg
+}
+
+
+exception DimensionesMatricesError {
+   1: string msg
+}
+
+
+exception MatrizNoTieneInversa {
+   1: string msg
+}
+
 service Calculadora{
-   list<double> suma_matrices(1: list<double> m1, 2: list<i64> dim1, 3:list<double> m2, 4:list<i64> dim2)
+   string calcula_expresion_matrices(1:string expresion) throws (1:DimensionesMatricesError e, 2:MatrizNoTieneInversa m),
+   double calcula_expresion_aritmetica(1:string expresion) throws (1: DivisionZero e)
 }

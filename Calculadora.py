@@ -18,13 +18,17 @@ except:
 
 
 class Iface:
-  def suma_matrices(self, m1, dim1, m2, dim2):
+  def calcula_expresion_matrices(self, expresion):
     """
     Parameters:
-     - m1
-     - dim1
-     - m2
-     - dim2
+     - expresion
+    """
+    pass
+
+  def calcula_expresion_aritmetica(self, expresion):
+    """
+    Parameters:
+     - expresion
     """
     pass
 
@@ -36,48 +40,79 @@ class Client(Iface):
       self._oprot = oprot
     self._seqid = 0
 
-  def suma_matrices(self, m1, dim1, m2, dim2):
+  def calcula_expresion_matrices(self, expresion):
     """
     Parameters:
-     - m1
-     - dim1
-     - m2
-     - dim2
+     - expresion
     """
-    self.send_suma_matrices(m1, dim1, m2, dim2)
-    return self.recv_suma_matrices()
+    self.send_calcula_expresion_matrices(expresion)
+    return self.recv_calcula_expresion_matrices()
 
-  def send_suma_matrices(self, m1, dim1, m2, dim2):
-    self._oprot.writeMessageBegin('suma_matrices', TMessageType.CALL, self._seqid)
-    args = suma_matrices_args()
-    args.m1 = m1
-    args.dim1 = dim1
-    args.m2 = m2
-    args.dim2 = dim2
+  def send_calcula_expresion_matrices(self, expresion):
+    self._oprot.writeMessageBegin('calcula_expresion_matrices', TMessageType.CALL, self._seqid)
+    args = calcula_expresion_matrices_args()
+    args.expresion = expresion
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
 
-  def recv_suma_matrices(self):
+  def recv_calcula_expresion_matrices(self):
     (fname, mtype, rseqid) = self._iprot.readMessageBegin()
     if mtype == TMessageType.EXCEPTION:
       x = TApplicationException()
       x.read(self._iprot)
       self._iprot.readMessageEnd()
       raise x
-    result = suma_matrices_result()
+    result = calcula_expresion_matrices_result()
     result.read(self._iprot)
     self._iprot.readMessageEnd()
     if result.success is not None:
       return result.success
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "suma_matrices failed: unknown result");
+    if result.e is not None:
+      raise result.e
+    if result.m is not None:
+      raise result.m
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "calcula_expresion_matrices failed: unknown result");
+
+  def calcula_expresion_aritmetica(self, expresion):
+    """
+    Parameters:
+     - expresion
+    """
+    self.send_calcula_expresion_aritmetica(expresion)
+    return self.recv_calcula_expresion_aritmetica()
+
+  def send_calcula_expresion_aritmetica(self, expresion):
+    self._oprot.writeMessageBegin('calcula_expresion_aritmetica', TMessageType.CALL, self._seqid)
+    args = calcula_expresion_aritmetica_args()
+    args.expresion = expresion
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_calcula_expresion_aritmetica(self):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = calcula_expresion_aritmetica_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    if result.e is not None:
+      raise result.e
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "calcula_expresion_aritmetica failed: unknown result");
 
 
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
     self._processMap = {}
-    self._processMap["suma_matrices"] = Processor.process_suma_matrices
+    self._processMap["calcula_expresion_matrices"] = Processor.process_calcula_expresion_matrices
+    self._processMap["calcula_expresion_aritmetica"] = Processor.process_calcula_expresion_aritmetica
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -94,13 +129,32 @@ class Processor(Iface, TProcessor):
       self._processMap[name](self, seqid, iprot, oprot)
     return True
 
-  def process_suma_matrices(self, seqid, iprot, oprot):
-    args = suma_matrices_args()
+  def process_calcula_expresion_matrices(self, seqid, iprot, oprot):
+    args = calcula_expresion_matrices_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    result = suma_matrices_result()
-    result.success = self._handler.suma_matrices(args.m1, args.dim1, args.m2, args.dim2)
-    oprot.writeMessageBegin("suma_matrices", TMessageType.REPLY, seqid)
+    result = calcula_expresion_matrices_result()
+    try:
+      result.success = self._handler.calcula_expresion_matrices(args.expresion)
+    except DimensionesMatricesError as e:
+      result.e = e
+    except MatrizNoTieneInversa as m:
+      result.m = m
+    oprot.writeMessageBegin("calcula_expresion_matrices", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_calcula_expresion_aritmetica(self, seqid, iprot, oprot):
+    args = calcula_expresion_aritmetica_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = calcula_expresion_aritmetica_result()
+    try:
+      result.success = self._handler.calcula_expresion_aritmetica(args.expresion)
+    except DivisionZero as e:
+      result.e = e
+    oprot.writeMessageBegin("calcula_expresion_aritmetica", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -108,28 +162,19 @@ class Processor(Iface, TProcessor):
 
 # HELPER FUNCTIONS AND STRUCTURES
 
-class suma_matrices_args:
+class calcula_expresion_matrices_args:
   """
   Attributes:
-   - m1
-   - dim1
-   - m2
-   - dim2
+   - expresion
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.LIST, 'm1', (TType.DOUBLE,None), None, ), # 1
-    (2, TType.LIST, 'dim1', (TType.I64,None), None, ), # 2
-    (3, TType.LIST, 'm2', (TType.DOUBLE,None), None, ), # 3
-    (4, TType.LIST, 'dim2', (TType.I64,None), None, ), # 4
+    (1, TType.STRING, 'expresion', None, None, ), # 1
   )
 
-  def __init__(self, m1=None, dim1=None, m2=None, dim2=None,):
-    self.m1 = m1
-    self.dim1 = dim1
-    self.m2 = m2
-    self.dim2 = dim2
+  def __init__(self, expresion=None,):
+    self.expresion = expresion
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -141,43 +186,8 @@ class suma_matrices_args:
       if ftype == TType.STOP:
         break
       if fid == 1:
-        if ftype == TType.LIST:
-          self.m1 = []
-          (_etype3, _size0) = iprot.readListBegin()
-          for _i4 in range(_size0):
-            _elem5 = iprot.readDouble();
-            self.m1.append(_elem5)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.LIST:
-          self.dim1 = []
-          (_etype9, _size6) = iprot.readListBegin()
-          for _i10 in range(_size6):
-            _elem11 = iprot.readI64();
-            self.dim1.append(_elem11)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
-      elif fid == 3:
-        if ftype == TType.LIST:
-          self.m2 = []
-          (_etype15, _size12) = iprot.readListBegin()
-          for _i16 in range(_size12):
-            _elem17 = iprot.readDouble();
-            self.m2.append(_elem17)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
-      elif fid == 4:
-        if ftype == TType.LIST:
-          self.dim2 = []
-          (_etype21, _size18) = iprot.readListBegin()
-          for _i22 in range(_size18):
-            _elem23 = iprot.readI64();
-            self.dim2.append(_elem23)
-          iprot.readListEnd()
+        if ftype == TType.STRING:
+          self.expresion = iprot.readString();
         else:
           iprot.skip(ftype)
       else:
@@ -189,34 +199,10 @@ class suma_matrices_args:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('suma_matrices_args')
-    if self.m1 is not None:
-      oprot.writeFieldBegin('m1', TType.LIST, 1)
-      oprot.writeListBegin(TType.DOUBLE, len(self.m1))
-      for iter24 in self.m1:
-        oprot.writeDouble(iter24)
-      oprot.writeListEnd()
-      oprot.writeFieldEnd()
-    if self.dim1 is not None:
-      oprot.writeFieldBegin('dim1', TType.LIST, 2)
-      oprot.writeListBegin(TType.I64, len(self.dim1))
-      for iter25 in self.dim1:
-        oprot.writeI64(iter25)
-      oprot.writeListEnd()
-      oprot.writeFieldEnd()
-    if self.m2 is not None:
-      oprot.writeFieldBegin('m2', TType.LIST, 3)
-      oprot.writeListBegin(TType.DOUBLE, len(self.m2))
-      for iter26 in self.m2:
-        oprot.writeDouble(iter26)
-      oprot.writeListEnd()
-      oprot.writeFieldEnd()
-    if self.dim2 is not None:
-      oprot.writeFieldBegin('dim2', TType.LIST, 4)
-      oprot.writeListBegin(TType.I64, len(self.dim2))
-      for iter27 in self.dim2:
-        oprot.writeI64(iter27)
-      oprot.writeListEnd()
+    oprot.writeStructBegin('calcula_expresion_matrices_args')
+    if self.expresion is not None:
+      oprot.writeFieldBegin('expresion', TType.STRING, 1)
+      oprot.writeString(self.expresion)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -236,18 +222,24 @@ class suma_matrices_args:
   def __ne__(self, other):
     return not (self == other)
 
-class suma_matrices_result:
+class calcula_expresion_matrices_result:
   """
   Attributes:
    - success
+   - e
+   - m
   """
 
   thrift_spec = (
-    (0, TType.LIST, 'success', (TType.DOUBLE,None), None, ), # 0
+    (0, TType.STRING, 'success', None, None, ), # 0
+    (1, TType.STRUCT, 'e', (DimensionesMatricesError, DimensionesMatricesError.thrift_spec), None, ), # 1
+    (2, TType.STRUCT, 'm', (MatrizNoTieneInversa, MatrizNoTieneInversa.thrift_spec), None, ), # 2
   )
 
-  def __init__(self, success=None,):
+  def __init__(self, success=None, e=None, m=None,):
     self.success = success
+    self.e = e
+    self.m = m
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -259,13 +251,20 @@ class suma_matrices_result:
       if ftype == TType.STOP:
         break
       if fid == 0:
-        if ftype == TType.LIST:
-          self.success = []
-          (_etype31, _size28) = iprot.readListBegin()
-          for _i32 in range(_size28):
-            _elem33 = iprot.readDouble();
-            self.success.append(_elem33)
-          iprot.readListEnd()
+        if ftype == TType.STRING:
+          self.success = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.e = DimensionesMatricesError()
+          self.e.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRUCT:
+          self.m = MatrizNoTieneInversa()
+          self.m.read(iprot)
         else:
           iprot.skip(ftype)
       else:
@@ -277,13 +276,150 @@ class suma_matrices_result:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('suma_matrices_result')
+    oprot.writeStructBegin('calcula_expresion_matrices_result')
     if self.success is not None:
-      oprot.writeFieldBegin('success', TType.LIST, 0)
-      oprot.writeListBegin(TType.DOUBLE, len(self.success))
-      for iter34 in self.success:
-        oprot.writeDouble(iter34)
-      oprot.writeListEnd()
+      oprot.writeFieldBegin('success', TType.STRING, 0)
+      oprot.writeString(self.success)
+      oprot.writeFieldEnd()
+    if self.e is not None:
+      oprot.writeFieldBegin('e', TType.STRUCT, 1)
+      self.e.write(oprot)
+      oprot.writeFieldEnd()
+    if self.m is not None:
+      oprot.writeFieldBegin('m', TType.STRUCT, 2)
+      self.m.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class calcula_expresion_aritmetica_args:
+  """
+  Attributes:
+   - expresion
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'expresion', None, None, ), # 1
+  )
+
+  def __init__(self, expresion=None,):
+    self.expresion = expresion
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.expresion = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('calcula_expresion_aritmetica_args')
+    if self.expresion is not None:
+      oprot.writeFieldBegin('expresion', TType.STRING, 1)
+      oprot.writeString(self.expresion)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class calcula_expresion_aritmetica_result:
+  """
+  Attributes:
+   - success
+   - e
+  """
+
+  thrift_spec = (
+    (0, TType.DOUBLE, 'success', None, None, ), # 0
+    (1, TType.STRUCT, 'e', (DivisionZero, DivisionZero.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, e=None,):
+    self.success = success
+    self.e = e
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.DOUBLE:
+          self.success = iprot.readDouble();
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.e = DivisionZero()
+          self.e.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('calcula_expresion_aritmetica_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.DOUBLE, 0)
+      oprot.writeDouble(self.success)
+      oprot.writeFieldEnd()
+    if self.e is not None:
+      oprot.writeFieldBegin('e', TType.STRUCT, 1)
+      self.e.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
